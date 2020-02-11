@@ -1,4 +1,6 @@
+import cv2 as cv
 from argparse import ArgumentParser
+from code.sound_from_video import *
 
 def parse_args():
     parser = ArgumentParser()
@@ -10,3 +12,4 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    cv.VideoCapture(args.input_video)
