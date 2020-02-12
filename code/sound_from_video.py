@@ -2,7 +2,7 @@ import cv2 as cv
 import math
 import numpy as np
 import pyrtools as pt
-import scipy.signal
+from scipy import signal
 
 
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
@@ -29,7 +29,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
   signalffs = {b: list() for b in pyr_ref.keys()}
 
-  for q in range(nframes):
+  for q in range(nframes - 1):
     _, vframein = v_hsandle.read()
     
     if downsample_factor < 1:
@@ -42,13 +42,13 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
     pyr = pyr.pyr_coeffs
 
     pyr_amp = dict()
-    for key, matrix in pyr.items():
-      pyr_amp[key] = np.abs(matrix)
+    for band, matrix in pyr.items():
+      pyr_amp[band] = np.abs(matrix)
 
     pyr_delta_phase = dict()
-    for key, matrix in pyr.items():
-      matrix_ref = pyr_ref[key]
-      pyr_delta_phase[key] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref) , 2 * math.pi) - math.pi
+    for band, matrix in pyr.items():
+      matrix_ref = pyr_ref[band]
+      pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref) , 2 * math.pi) - math.pi
       
     for band in pyr.keys():
       amp = pyr_amp[band]
@@ -74,7 +74,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # x = signal.ifilter(b, a, sigout)
   
   # More stable filter
-  sos = signal.butter(3, 0.05, btyte='highpass', output='sos')
+  sos = signal.butter(3, 0.05, btype='highpass', output='sos')
   x = signal.sosfilt(sos, sigout)
 
   # TODO
