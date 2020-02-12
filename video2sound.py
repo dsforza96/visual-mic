@@ -12,4 +12,5 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    cv.VideoCapture(args.input_video)
+    vr = cv.VideoCapture(args.input_video)
+    sound_from_video(vr, 1, 2)
