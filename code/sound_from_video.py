@@ -86,7 +86,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   if maxsx != 1.0 or minsx != -1.0:
     rangesx = maxsx - minsx
     x = 2 * x / rangesx
-    nexmax = np.max(x)
+    newmax = np.max(x)
     offset = newmax - 1.0
     x = x - offset
 
