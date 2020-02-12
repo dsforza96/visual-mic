@@ -2,6 +2,7 @@ import cv2 as cv
 import math
 import numpy as np
 import pyrtools as pt
+import scipy.signal
 
 
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
@@ -26,9 +27,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   pyr_ref = pyr.pyr_coeffs
   pind = pyr.pyr_size
 
-  totalsigs = nscale * norientation  
-  signalffs = np.zeros((nscale, norientation, nframes))
-  ampsigs = np.zeros((nscale, norientation, nframes))
+  signalffs = {b: list() for b in pyr_ref.keys()}
 
   for q in range(nframes):
     _, vframein = v_hsandle.read()
@@ -59,10 +58,50 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
       sumamp = np.sum(np.abs(amp.flatten()))
       
-        
+      signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
 
-def align_A2B(ax, bx):
-  pass
+  sigout = np.zeros((nframes, 1))
+  
+  for sig in signalffs.values():
+    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))
+
+    sigout = sigout + sig_aligned
+
+  # TODO
+  # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
+
+  # b, a = signal.butter(3, 0.05, btyte='highpass')
+  # x = signal.ifilter(b, a, sigout)
+  
+  # More stable filter
+  sos = signal.butter(3, 0.05, btyte='highpass', output='sos')
+  x = signal.sosfilt(sos, sigout)
+
+  # TODO
+  # S.x(1:10)=mean(S.x);
+
+  maxsx = np.max(x)
+  minsx = np.min(x)
+
+  if maxsx != 1.0 or minsx != -1.0:
+    rangesx = maxsx - minsx
+    x = 2 * x / rangesx
+    nexmax = np.max(x)
+    offset = newmax - 1.0
+    x = x - offset
+
+  return x
+  
+def align_A2B(ax: np.array, bx: np.array):
+  acorb = np.convolve(ax, np.flip(bx))
+
+  maxval = np.max(acorb)
+  maxind = np.argmax(acorb)
+
+  shiftam = bx.size - maxind
+  ax_out = np.roll(ax, shiftam)
+
+  return ax_out, shiftam
   
 # Not used functions
 def stft_forward(x, sz, hp, pd, w, ll):
