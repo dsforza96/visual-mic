@@ -23,7 +23,7 @@ if __name__ == '__main__':
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
   plt.figure()
-  plt.specgram(x, Fs=sr, noverlap=200)
+  plt.specgram(x, Fs=sr, noverlap=240)
   plt.show()
 
   wavfile.write(args.output, sr, x)
