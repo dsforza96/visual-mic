@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import cv2 as cv
+import matplotlib.pyplot as plt
 from scipy.io import wavfile
 
 from code.sound_from_video import *
@@ -20,5 +21,9 @@ if __name__ == '__main__':
   sr = round(vr.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
 
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
+
+  plt.figure()
+  plt.specgram(x, Fs=sr)
+  plt.show()
 
   wavfile.write(args.output, sr, x)
