@@ -65,7 +65,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
     sigout = sigout + sig_aligned
 
   # b, a = signal.butter(3, 0.05, btype='highpass')
-  # x = signal.ifilter(b, a, sigout)
+  # x = signal.lfilter(b, a, sigout)
 
   # More stable filter
   sos = signal.butter(3, 0.05, btype='highpass', output='sos')
