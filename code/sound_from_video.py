@@ -13,6 +13,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
   if downsample_factor < 1:
     colorframe = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
+  else:
+    colorframe = vframein
 
   grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
   full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
