@@ -21,4 +21,4 @@ if __name__ == '__main__':
 
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
-  wavfile.write(args.output, args.sampling_rate, x)
+  wavfile.write(args.output, sr, x)
