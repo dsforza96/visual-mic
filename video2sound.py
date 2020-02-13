@@ -25,7 +25,7 @@ if __name__ == '__main__':
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
   plt.figure()
-  plt.specgram(x, Fs=sr, noverlap=200)
+  plt.specgram(x, Fs=sr)
   plt.show()
 
   wavfile.write(args.output, sr, x)
@@ -33,7 +33,7 @@ if __name__ == '__main__':
   x_specsub = get_soud_spec_sub(x)
 
   plt.figure()
-  plt.specgram(x_specsub, Fs=sr, noverlap=200)
+  plt.specgram(x_specsub, Fs=sr)
   plt.show()
 
   dir, file = path.split(args.output)

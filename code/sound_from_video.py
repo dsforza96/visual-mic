@@ -4,6 +4,20 @@ import numpy as np
 import pyrtools as pt
 from scipy import signal
 
+from sound_spectral_subtraction import get_sound_scaled_to_one
+
+
+def align_A2B(ax: np.array, bx: np.array):
+  acorb = np.convolve(ax, np.flip(bx))
+
+  maxval = np.max(acorb)
+  maxind = np.argmax(acorb)
+
+  shiftam = bx.size - maxind
+  ax_out = np.roll(ax, shiftam)
+
+  return ax_out, shiftam
+
 
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
   if sampling_rate is None:
@@ -75,43 +89,9 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # TODO
   # S.x(1:10)=mean(S.x);
 
-  maxsx = np.max(x)
-  minsx = np.min(x)
-
-  if maxsx != 1.0 or minsx != -1.0:
-    rangesx = maxsx - minsx
-    x = 2 * x / rangesx
-    newmax = np.max(x)
-    offset = newmax - 1.0
-    x = x - offset
+  x = get_sound_scaled_to_one(x)
 
   # TODO
   # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
 
   return x, sigout
-
-
-def align_A2B(ax: np.array, bx: np.array):
-  acorb = np.convolve(ax, np.flip(bx))
-
-  maxval = np.max(acorb)
-  maxind = np.argmax(acorb)
-
-  shiftam = bx.size - maxind
-  ax_out = np.roll(ax, shiftam)
-
-  return ax_out, shiftam
-
-
-# Not used functions
-def stft_forward(x, sz, hp, pd, w, ll):
-  pass
-
-def stft_resynth(x, sz, hp, pd, w, ll):
-  pass
-
-def computer_STFT(S, widowsize, hopsize):
-  pass
-
-def computer_spec_sub(sstft, qtl1, qtl2):
-  pass

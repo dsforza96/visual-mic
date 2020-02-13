@@ -2,6 +2,22 @@ import numpy as np
 from scipy import signal
 
 
+def get_sound_scaled_to_one(x_in: np.array):
+  x = x_in
+
+  maxsx = np.max(x)
+  minsx = np.min(x)
+
+  if maxsx != 1.0 or minsx != -1.0:
+    rangesx = maxsx - minsx
+    x = 2 * x / rangesx
+    newmax = np.max(x)
+    offset = newmax - 1.0
+    x = x - offset
+
+  return x
+
+
 def get_soud_spec_sub (x: np.array):
   _, _, st = signal.stft(x)
 
@@ -19,13 +35,6 @@ def get_soud_spec_sub (x: np.array):
 
   _, new_x = signal.istft(newst)
 
-  maxsx = np.max(new_x)
-  minsx = np.min(new_x)
-  if maxsx != 1.0 or minsx != -1.0:
-    rangesx = maxsx - minsx
-    new_x = 2 * new_x / rangesx
-    newmax = np.max(new_x)
-    offset = newmax - 1.0
-    new_x = new_x - offset
+  new_x = get_sound_scaled_to_one(new_x)
 
   return new_x
