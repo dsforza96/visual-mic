@@ -17,7 +17,7 @@ if __name__ == '__main__':
   args = parse_args()
 
   vr = cv.VideoCapture(args.input_video)
-  sr = vr.get(cv.CAP_PROP_FPS) if args.sampling_rate is None else round(args.sampling_rate)
+  sr = round(vr.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
 
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 

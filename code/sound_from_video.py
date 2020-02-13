@@ -100,7 +100,7 @@ def align_A2B(ax: np.array, bx: np.array):
   ax_out = np.roll(ax, shiftam)
 
   return ax_out, shiftam
-  
+
 # Not used functions
 def stft_forward(x, sz, hp, pd, w, ll):
   pass
