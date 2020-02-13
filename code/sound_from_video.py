@@ -9,7 +9,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   if sampling_rate is None:
     sampling_rate = v_hsandle.get(cv.CAP_PROP_FPS)
 
-  _, colorframe =  v_hsandle.read()
+  ret, colorframe =  v_hsandle.read()
+  vframein = colorframe
 
   if downsample_factor < 1:
     colorframe = cv.resize(colorframe, (0,0), fx=downsample_factor, fy=downsample_factor)
@@ -29,9 +30,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
   signalffs = {b: list() for b in pyr_ref.keys()}
 
-  for q in range(nframes - 1):
-    _, vframein = v_hsandle.read()
-    
+  while (ret):
     if downsample_factor < 1:
       vframein = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
     
@@ -59,16 +58,14 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       sumamp = np.sum(np.abs(amp.flatten()))
       
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
+    
+    ret, vframein = v_hsandle.read()
 
-  sigout = np.zeros((nframes, 1))
+  sigout = np.zeros(nframes)
   
   for sig in signalffs.values():
     sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))
-
     sigout = sigout + sig_aligned
-
-  # TODO
-  # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
 
   # b, a = signal.butter(3, 0.05, btyte='highpass')
   # x = signal.ifilter(b, a, sigout)
@@ -90,7 +87,10 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
     offset = newmax - 1.0
     x = x - offset
 
-  return x
+  # TODO
+  # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
+
+  return x, sigout
   
 def align_A2B(ax: np.array, bx: np.array):
   acorb = np.convolve(ax, np.flip(bx))
