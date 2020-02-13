@@ -10,7 +10,6 @@ from code.sound_spectral_subtraction import get_sound_scaled_to_one
 def align_A2B(ax: np.array, bx: np.array):
   acorb = np.convolve(ax, np.flip(bx))
 
-  maxval = np.max(acorb)
   maxind = np.argmax(acorb)
 
   shiftam = bx.size - maxind
