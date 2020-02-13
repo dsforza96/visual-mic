@@ -26,6 +26,7 @@ if __name__ == '__main__':
 
   plt.figure()
   plt.specgram(x, Fs=sr)
+  plt.colorbar()
   plt.show()
 
   wavfile.write(args.output, sr, x)
@@ -34,6 +35,7 @@ if __name__ == '__main__':
 
   plt.figure()
   plt.specgram(x_specsub, Fs=sr)
+  plt.colorbar()
   plt.show()
 
   dir, file = path.split(args.output)
