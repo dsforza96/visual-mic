@@ -8,34 +8,30 @@ from scipy import signal
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
   if sampling_rate is None:
     sampling_rate = v_hsandle.get(cv.CAP_PROP_FPS)
-    print(sampling_rate)
 
-  ret, colorframe =  v_hsandle.read()
+  ret, colorframe = v_hsandle.read()
   vframein = colorframe
 
   if downsample_factor < 1:
     colorframe = cv.resize(colorframe, (0,0), fx=downsample_factor, fy=downsample_factor)
-  
+
   grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
   full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
-  
+
   ref_frame = full_frame
-  h, w = ref_frame.shape
 
   if nframes is None:
     nframes = int(v_hsandle.get(cv.CAP_PROP_FRAME_COUNT))
-    print(nframes)
 
   pyr = pt.pyramids.SteerablePyramidFreq(ref_frame, nscale, norientation - 1, is_complex=True)
   pyr_ref = pyr.pyr_coeffs
-  pind = pyr.pyr_size
 
   signalffs = {b: list() for b in pyr_ref.keys()}
 
-  while (ret):
+  while ret:
     if downsample_factor < 1:
       vframein = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
-    
+
     grayframe = cv.cvtColor(vframein, cv.COLOR_BGR2GRAY)
     full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
@@ -49,8 +45,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
     pyr_delta_phase = dict()
     for band, matrix in pyr.items():
       matrix_ref = pyr_ref[band]
-      pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref) , 2 * math.pi) - math.pi
-      
+      pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref), 2 * math.pi) - math.pi
+
     for band in pyr.keys():
       amp = pyr_amp[band]
       phase = pyr_delta_phase[band]
@@ -58,21 +54,20 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
 
       sumamp = np.sum(np.abs(amp.flatten()))
-      if sumamp == 0:
-        print(sumamp)
+
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
-    
+
     ret, vframein = v_hsandle.read()
 
   sigout = np.zeros(nframes)
-  
   for sig in signalffs.values():
-    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))
+    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))  # With "residual_lowpass" same result
+
     sigout = sigout + sig_aligned
 
-  # b, a = signal.butter(3, 0.05, btyte='highpass')
+  # b, a = signal.butter(3, 0.05, btype='highpass')
   # x = signal.ifilter(b, a, sigout)
-  
+
   # More stable filter
   sos = signal.butter(3, 0.05, btype='highpass', output='sos')
   x = signal.sosfilt(sos, sigout)
@@ -94,7 +89,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
 
   return x, sigout
-  
+
+
 def align_A2B(ax: np.array, bx: np.array):
   acorb = np.convolve(ax, np.flip(bx))
 
