@@ -9,11 +9,10 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   if sampling_rate is None:
     sampling_rate = v_hsandle.get(cv.CAP_PROP_FPS)
 
-  ret, colorframe = v_hsandle.read()
-  vframein = colorframe
+  ret, vframein = v_hsandle.read()
 
   if downsample_factor < 1:
-    colorframe = cv.resize(colorframe, (0,0), fx=downsample_factor, fy=downsample_factor)
+    colorframe = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
 
   grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
   full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
@@ -100,6 +99,7 @@ def align_A2B(ax: np.array, bx: np.array):
   ax_out = np.roll(ax, shiftam)
 
   return ax_out, shiftam
+
 
 # Not used functions
 def stft_forward(x, sz, hp, pd, w, ll):
