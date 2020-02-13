@@ -7,7 +7,7 @@ def get_soud_spec_sub (x: np.array):
 
   stmags = np.multiply(np.abs(st), np.abs(st))
   stangles = np.angle(st)
-    
+
   hold_col = np.quantile(stmags, 0.5, axis=1)
 
   for q in range(stmags.shape[1]):

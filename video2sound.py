@@ -28,6 +28,8 @@ if __name__ == '__main__':
   plt.specgram(x, Fs=sr, noverlap=200)
   plt.show()
 
+  wavfile.write(args.output, sr, x)
+
   x_specsub = get_soud_spec_sub(x)
 
   plt.figure()
