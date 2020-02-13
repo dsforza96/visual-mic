@@ -7,6 +7,7 @@ from scipy.io import wavfile
 from code.sound_from_video import *
 from code.sound_spectral_subtraction import *
 
+
 def parse_args():
   parser = ArgumentParser()
   parser.add_argument('input_video', help='The path of the input video')
