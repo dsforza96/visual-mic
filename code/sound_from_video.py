@@ -52,7 +52,6 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       phase = pyr_delta_phase[band]
 
       phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
-
       sumamp = np.sum(np.abs(amp.flatten()))
 
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
