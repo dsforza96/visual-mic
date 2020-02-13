@@ -8,6 +8,7 @@ from scipy import signal
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
   if sampling_rate is None:
     sampling_rate = v_hsandle.get(cv.CAP_PROP_FPS)
+    print(sampling_rate)
 
   ret, colorframe =  v_hsandle.read()
   vframein = colorframe
@@ -23,6 +24,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
   if nframes is None:
     nframes = int(v_hsandle.get(cv.CAP_PROP_FRAME_COUNT))
+    print(nframes)
 
   pyr = pt.pyramids.SteerablePyramidFreq(ref_frame, nscale, norientation - 1, is_complex=True)
   pyr_ref = pyr.pyr_coeffs
@@ -56,7 +58,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
 
       sumamp = np.sum(np.abs(amp.flatten()))
-      
+      if sumamp == 0:
+        print(sumamp)
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
     
     ret, vframein = v_hsandle.read()

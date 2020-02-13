@@ -1,5 +1,6 @@
 import cv2 as cv
 from argparse import ArgumentParser
+from scipy.io import wavfile
 from code.sound_from_video import *
 
 def parse_args():
@@ -13,5 +14,6 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     vr = cv.VideoCapture(args.input_video)
-    x, sigout = sound_from_video(vr, 1, 2, downsample_factor=0.1)
+    x, sigout = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=480)
+    wavfile.write(args.output, 480, x)
     print(x, x.shape)
