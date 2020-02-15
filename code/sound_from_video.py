@@ -6,7 +6,7 @@ from scipy import signal
 
 from code.sound_spectral_subtraction import get_sound_scaled_to_one
 
-
+# This function allign ax and bx vectors, it is the formula (4) of paper
 def align_A2B(ax: np.array, bx: np.array):
   acorb = np.convolve(ax, np.flip(bx))
 
@@ -78,9 +78,9 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
       # Here we have the formula (3) of the paper where we compute a sigle motion signal 
       phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
-      sumamp = np.sum(np.abs(amp.flatten()))
 
       # Here we do the mean 
+      sumamp = np.sum(np.abs(amp.flatten()))
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
 
     ret, vframein = v_hsandle.read()
