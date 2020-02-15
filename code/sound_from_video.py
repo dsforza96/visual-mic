@@ -56,6 +56,8 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
     # Creating StreerablePyramid of the frame
     pyr = pt.pyramids.SteerablePyramidFreq(full_frame, nscale, norientation - 1, is_complex=True)
+    # Can be changed with this
+    # pyr = pt.pyramids.SteerablePyramidSpace(full_frame, nscale, norientation - 1) 
     pyr = pyr.pyr_coeffs
 
     # Make all bands positive to build the pyramide amplitude
