@@ -71,18 +71,22 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       matrix_ref = pyr_ref[band]
       pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref), 2 * math.pi) - math.pi
 
-    # Here we have the formula (3) of the paper where we compute a sigle motion signal 
+    
     for band in pyr.keys():
       amp = pyr_amp[band]
       phase = pyr_delta_phase[band]
 
+      # Here we have the formula (3) of the paper where we compute a sigle motion signal 
       phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
       sumamp = np.sum(np.abs(amp.flatten()))
 
+      # Here we do the mean 
       signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
 
     ret, vframein = v_hsandle.read()
 
+
+  # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
   sigout = np.zeros(nframes)
   for sig in signalffs.values():
     sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))  # With "residual_lowpass" same result
