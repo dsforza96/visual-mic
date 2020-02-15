@@ -29,6 +29,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   else:
     colorframe = vframein
 
+  # Converting the first frame to Gray
   grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
   full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
@@ -37,30 +38,40 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   if nframes is None:
     nframes = int(v_hsandle.get(cv.CAP_PROP_FRAME_COUNT))
 
+  # Creating StreerablePyramid of the first frame 
   pyr = pt.pyramids.SteerablePyramidFreq(ref_frame, nscale, norientation - 1, is_complex=True)
   pyr_ref = pyr.pyr_coeffs
 
+  # Creating a zeros copy of pyramid bands
   signalffs = {b: list() for b in pyr_ref.keys()}
 
+  # iteration over the frames
   while ret:
     if downsample_factor < 1:
       vframein = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
 
+    # Create a grey frame
     grayframe = cv.cvtColor(vframein, cv.COLOR_BGR2GRAY)
     full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
+    # Creating StreerablePyramid of the frame
     pyr = pt.pyramids.SteerablePyramidFreq(full_frame, nscale, norientation - 1, is_complex=True)
     pyr = pyr.pyr_coeffs
 
+    # Make all bands positive to build the pyramide amplitude
     pyr_amp = dict()
     for band, matrix in pyr.items():
       pyr_amp[band] = np.abs(matrix)
 
+    # We have that np.angle return for each complex number the angle (in radiant) of the vector that the complex number form over (Real, i) space. 
+    # We calculate the differences of the angle of the bands between the current frame and the first frame of the image
+    # Formula (2) of the paper
     pyr_delta_phase = dict()
     for band, matrix in pyr.items():
       matrix_ref = pyr_ref[band]
       pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref), 2 * math.pi) - math.pi
 
+    # Here we have the formula (3) of the paper where we compute a sigle motion signal 
     for band in pyr.keys():
       amp = pyr_amp[band]
       phase = pyr_delta_phase[band]
