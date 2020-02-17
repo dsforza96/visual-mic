@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from os import path
 from scipy.io import wavfile
 
-from code.sound_from_video import *
-from code.sound_spectral_subtraction import *
+from video2sound.sound_from_video import *
+from video2sound.sound_spectral_subtraction import *
 
 
 def parse_args():
@@ -26,7 +26,7 @@ if __name__ == '__main__':
   x, _ = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
   plt.figure()
-  plt.specgram(x, Fs=sr, cmap=plt.get_cmap('hot'))
+  plt.specgram(x, Fs=sr, cmap=plt.get_cmap('jet'))
   plt.colorbar()
   plt.show()
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
   x_specsub = get_soud_spec_sub(x)
 
   plt.figure()
-  plt.specgram(x_specsub, Fs=sr, cmap=plt.get_cmap('hot'))
+  plt.specgram(x_specsub, Fs=sr, cmap=plt.get_cmap('jet'))
   plt.colorbar()
   plt.show()
 

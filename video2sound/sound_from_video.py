@@ -4,7 +4,7 @@ import numpy as np
 import pyrtools as pt
 from scipy import signal
 
-from code.sound_spectral_subtraction import get_sound_scaled_to_one
+from .sound_spectral_subtraction import get_sound_scaled_to_one
 
 # This function allign ax and bx vectors, it is the formula (4) of paper
 def align_A2B(ax: np.array, bx: np.array):
