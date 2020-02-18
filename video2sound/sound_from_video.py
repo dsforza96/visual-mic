@@ -73,7 +73,6 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
       matrix_ref = pyr_ref[band]
       pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref), 2 * math.pi) - math.pi
 
-    
     for band in pyr.keys():
       amp = pyr_amp[band]
       phase = pyr_delta_phase[band]
@@ -87,13 +86,12 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
     ret, vframein = v_hsandle.read()
 
-
   # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
   sigout = np.zeros(nframes)
   for sig in signalffs.values():
     sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))  # With "residual_lowpass" same result
 
-    sigout = sigout + sig_aligned
+    sigout += sig_aligned
 
   # b, a = signal.butter(3, 0.05, btype='highpass')
   # x = signal.lfilter(b, a, sigout)
@@ -110,4 +108,10 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # TODO
   # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
 
-  return x, sigout
+  average_no_alignment = np.zeros(nframes)
+  for sig in signalffs.values():
+    average_no_alignment += np.array(sig)
+
+  average_no_alignment /= len(signalffs)
+
+  return x, sigout, average_no_alignment
