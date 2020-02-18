@@ -42,10 +42,10 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   pyr = pt.pyramids.SteerablePyramidFreq(ref_frame, nscale, norientation - 1, is_complex=True)
   pyr_ref = pyr.pyr_coeffs
 
-  # Creating a zeros copy of pyramid bands
+  # Creating an empty copy of pyramid bands
   signalffs = {b: list() for b in pyr_ref.keys()}
 
-  # iteration over the frames
+  # Iteration over the frames
   while ret:
     if downsample_factor < 1:
       vframein = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
@@ -56,8 +56,10 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
 
     # Creating StreerablePyramid of the frame
     pyr = pt.pyramids.SteerablePyramidFreq(full_frame, nscale, norientation - 1, is_complex=True)
+
     # Can be changed with this
     # pyr = pt.pyramids.SteerablePyramidSpace(full_frame, nscale, norientation - 1) 
+
     pyr = pyr.pyr_coeffs
 
     # Make all bands positive to build the pyramide amplitude
