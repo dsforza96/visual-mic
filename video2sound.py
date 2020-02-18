@@ -32,7 +32,7 @@ if __name__ == '__main__':
   video = cv.VideoCapture(args.input_video)
   sr = round(video.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
 
-  sound = sound_from_video(video, 1, 2, downsample_factor=0.1, sampling_rate=sr)
+  sound = sound_from_video(video, 1, 2, downsample_factor=0.1)
 
   plot_specgram(sound, sr)
   wavfile.write(args.output, sr, sound)

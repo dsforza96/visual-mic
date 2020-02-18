@@ -19,9 +19,8 @@ def align_vectors(v1: np.array, v2: np.array):
   return out
 
 
-def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
-  if sampling_rate is None:
-    sampling_rate = video.get(cv.CAP_PROP_FPS)
+def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_factor=1):
+  nframes = int(video.get(cv.CAP_PROP_FRAME_COUNT))
 
   ret, frame = video.read()
 
@@ -35,9 +34,6 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
   norm_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
   first_frame = norm_frame
-
-  if nframes is None:
-    nframes = int(video.get(cv.CAP_PROP_FRAME_COUNT))
 
   # Creating StreerablePyramid of the first frame
   first_pyramid = pt.pyramids.SteerablePyramidFreq(first_frame, nscale, norientation - 1, is_complex=True)
