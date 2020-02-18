@@ -15,7 +15,7 @@ def align_A2B(ax: np.array, bx: np.array):
   shiftam = bx.size - maxind
   ax_out = np.roll(ax, shiftam)
 
-  return ax_out, shiftam
+  return ax_out
 
 
 def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
@@ -89,7 +89,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
   sigout = np.zeros(nframes)
   for sig in signalffs.values():
-    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
+    sig_aligned = align_A2B(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
 
     sigout += sig_aligned
 
@@ -100,18 +100,6 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   sos = signal.butter(3, 0.05, btype='highpass', output='sos')
   x = signal.sosfilt(sos, sigout)
 
-  # TODO
-  # S.x(1:10)=mean(S.x);
-
   x = get_sound_scaled_to_one(x)
 
-  # TODO
-  # S.averageNoAlignment = mean(reshape(double(signalffs),nScales*nOrients,nF)).';
-
-  average_no_alignment = np.zeros(nframes)
-  for sig in signalffs.values():
-    average_no_alignment += np.array(sig)
-
-  average_no_alignment /= len(signalffs)
-
-  return x, sigout, average_no_alignment
+  return x

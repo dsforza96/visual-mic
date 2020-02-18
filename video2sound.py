@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from os import path
 from scipy.io import wavfile
 
-from video2sound.sound_from_video import sound_from_video
-from video2sound.sound_spectral_subtraction import get_soud_spec_sub
+from visualmic.sound_from_video import sound_from_video
+from visualmic.sound_spectral_subtraction import get_soud_spec_sub
 
 
 def parse_args():
@@ -26,29 +26,16 @@ def plot_specgram(x, sampling_rate):
   plt.show()
 
 
-# def save_audio(x, sr, output_file, file_suffix=''):
-#   dir, file = path.split(output_file)
-#   f_name, f_extension = path.splitext(file)
-
-#   wavfile.write(path.join(dir, f_name + file_suffix + f_extension), sr, x)
-
-
 if __name__ == '__main__':
   args = parse_args()
 
   vr = cv.VideoCapture(args.input_video)
   sr = round(vr.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
 
-  x, x_nofilt, x_noalig = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
+  x = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
   plot_specgram(x, sr)
   wavfile.write(args.output, sr, x)
-
-  # plot_specgram(x_nofilt, sr)
-  # save_audio(x_nofilt, sr, args.output, '_nofilt')
-
-  # plot_specgram(x_noalig, sr)
-  # save_audio(x_noalig, sr, args.output, '_noalig')
 
   x_specsub = get_soud_spec_sub(x)
 
@@ -58,5 +45,3 @@ if __name__ == '__main__':
   f_name, f_extension = path.splitext(file)
 
   wavfile.write(path.join(dir, f_name + '_specsub' + f_extension), sr, x_specsub)
-
-  # save_audio(x_specsub, sr, args.output, '_specsub')
