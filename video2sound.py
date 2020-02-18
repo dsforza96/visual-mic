@@ -12,7 +12,7 @@ def parse_args():
   parser = ArgumentParser()
   parser.add_argument('input_video', help='The path of the input video')
   parser.add_argument('-o', '--output', help='The path of the output file', default='recoveredsound.wav')
-  parser.add_argument('-s', '--sampling-rate', help='The video sampling rate', type=int, default=None)
+  parser.add_argument('-s', '--sampling-rate', help='The video frame rate', type=int, default=None)
 
   return parser.parse_args()
 
