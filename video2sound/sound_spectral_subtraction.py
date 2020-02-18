@@ -24,9 +24,9 @@ def get_soud_spec_sub(x: np.array, qtl=0.5):
   stmags = np.multiply(np.abs(st), np.abs(st))
   stangles = np.angle(st)
 
-  hold_col = np.quantile(stmags, qtl, axis=1)
+  hold_col = np.quantile(stmags, qtl, axis=-1)
 
-  for q in range(stmags.shape[1]):
+  for q in range(stmags.shape[-1]):
     stmags[:, q] -= hold_col
     stmags[:, q] = np.maximum(stmags[:,q], 0.0)
 
