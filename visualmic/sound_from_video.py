@@ -67,7 +67,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
     for band, matrix in pyr.items():
       pyr_amp[band] = np.abs(matrix)
 
-    # We have that np.angle return for each complex number the angle (in radiant) of the vector that the complex number form over (Real, i) space. 
+    # We have that np.angle return for each complex number the angle (in radiant) of the vector that the complex number form over (Real, i) space.
     # We calculate the differences of the angle of the bands between the current frame and the first frame of the image
     # Formula (2) of the paper
     pyr_delta_phase = dict()

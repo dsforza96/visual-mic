@@ -2,6 +2,7 @@ import numpy as np
 from scipy import signal
 
 
+# This function scale and center x_in to the range [-1, 1]
 def get_sound_scaled_to_one(x_in: np.array):
   x = x_in
 
@@ -18,6 +19,8 @@ def get_sound_scaled_to_one(x_in: np.array):
   return x
 
 
+# Function to improve x using spectral subtraction. Adapted
+# from the original work of Myers Abraham Davis (Abe Davis), MIT
 def get_soud_spec_sub(x: np.array, qtl=0.5):
   _, _, st = signal.stft(x)
 
