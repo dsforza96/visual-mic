@@ -7,7 +7,7 @@ from scipy import signal
 from .sound_spectral_subtraction import get_sound_scaled_to_one
 
 # This function allign ax and bx vectors, it is the formula (4) of paper
-def align_A2B(ax: np.array, bx: np.array):
+def align_vectors(ax: np.array, bx: np.array):
   acorb = np.convolve(ax, np.flip(bx))
 
   maxind = np.argmax(acorb)
@@ -91,7 +91,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
   sigout = np.zeros(nframes)
   for sig in signalffs.values():
-    sig_aligned = align_A2B(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
+    sig_aligned = align_vectors(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
 
     sigout += sig_aligned
 
