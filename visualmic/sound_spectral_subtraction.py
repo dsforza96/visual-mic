@@ -3,7 +3,7 @@ from scipy import signal
 
 
 # This function scale and center sound to the range [-1, 1]
-def get_sound_scaled_to_one(sound: np.array):
+def get_scaled_sound(sound: np.array):
   maxv = np.max(sound)
   minv = np.min(sound)
 
@@ -36,6 +36,6 @@ def get_soud_spec_sub(sound: np.array, qtl=0.5):
 
   _, new_sound = signal.istft(newst)
 
-  new_sound = get_sound_scaled_to_one(new_sound)
+  new_sound = get_scaled_sound(new_sound)
 
   return new_sound

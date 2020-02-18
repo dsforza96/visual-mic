@@ -4,7 +4,7 @@ import numpy as np
 import pyrtools as pt
 from scipy import signal
 
-from .sound_spectral_subtraction import get_sound_scaled_to_one
+from .sound_spectral_subtraction import get_scaled_sound
 
 # This function allign v1 and v2 vectors, it is the formula (4) of paper
 def align_vectors(v1: np.array, v2: np.array):
@@ -102,6 +102,6 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
   sos = signal.butter(3, 0.05, btype='highpass', output='sos')
   filtered_sound = signal.sosfilt(sos, sound)
 
-  filtered_sound = get_sound_scaled_to_one(filtered_sound)
+  filtered_sound = get_scaled_sound(filtered_sound)
 
   return filtered_sound
