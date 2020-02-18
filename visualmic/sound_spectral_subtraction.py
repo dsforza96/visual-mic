@@ -27,9 +27,9 @@ def get_soud_spec_sub(sound: np.array, qtl=0.5):
 
   noise_floor = np.quantile(st_mags, qtl, axis=-1)
 
-  for q in range(st_mags.shape[-1]):
-    st_mags[:, q] -= noise_floor
-    st_mags[:, q] = np.maximum(st_mags[:,q], 0.0)
+  for t in range(st_mags.shape[-1]):
+    st_mags[:, t] -= noise_floor
+    st_mags[:, t] = np.maximum(st_mags[:, t], 0.0)
 
   st_mags = np.sqrt(st_mags)
   newst = np.multiply(st_mags, 1j * st_angles)

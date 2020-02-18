@@ -74,10 +74,10 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
 
     for band in pyramid.keys():
       amp = amp_pyramid[band]
-      phase = dphase_pyramid[band]
+      dphase = dphase_pyramid[band]
 
       # Here we have the formula (3) of the paper where we compute a sigle motion signal
-      sms = np.multiply(phase, np.multiply(amp, amp))
+      sms = np.multiply(dphase, np.multiply(amp, amp))
 
       # Here we do the mean
       total_amp = np.sum(amp.flatten())
