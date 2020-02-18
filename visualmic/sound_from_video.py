@@ -6,102 +6,102 @@ from scipy import signal
 
 from .sound_spectral_subtraction import get_sound_scaled_to_one
 
-# This function allign ax and bx vectors, it is the formula (4) of paper
-def align_vectors(ax: np.array, bx: np.array):
-  acorb = np.convolve(ax, np.flip(bx))
+# This function allign v1 and v2 vectors, it is the formula (4) of paper
+def align_vectors(v1: np.array, v2: np.array):
+  acorb = np.convolve(v1, np.flip(v2))
 
   maxind = np.argmax(acorb)
 
-  shiftam = bx.size - maxind
-  ax_out = np.roll(ax, shiftam)
+  shift = v2.size - maxind
+  out = np.roll(v1, shift)
 
-  return ax_out
+  return out
 
 
-def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
+def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_factor=1, nframes=None, sampling_rate=None):
   if sampling_rate is None:
-    sampling_rate = v_hsandle.get(cv.CAP_PROP_FPS)
+    sampling_rate = video.get(cv.CAP_PROP_FPS)
 
-  ret, vframein = v_hsandle.read()
+  ret, frame = video.read()
 
   if downsample_factor < 1:
-    colorframe = cv.resize(vframein, (0, 0), fx=downsample_factor, fy=downsample_factor)
+    colorframe = cv.resize(frame, (0, 0), fx=downsample_factor, fy=downsample_factor)
   else:
-    colorframe = vframein
+    colorframe = frame
 
   # Converting the first frame to Gray
   grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
-  full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
+  norm_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
-  ref_frame = full_frame
+  first_frame = norm_frame
 
   if nframes is None:
-    nframes = int(v_hsandle.get(cv.CAP_PROP_FRAME_COUNT))
+    nframes = int(video.get(cv.CAP_PROP_FRAME_COUNT))
 
   # Creating StreerablePyramid of the first frame 
-  pyr = pt.pyramids.SteerablePyramidFreq(ref_frame, nscale, norientation - 1, is_complex=True)
-  pyr_ref = pyr.pyr_coeffs
+  first_pyramid = pt.pyramids.SteerablePyramidFreq(first_frame, nscale, norientation - 1, is_complex=True)
+  first_piramid = first_pyramid.pyr_coeffs
 
   # Creating an empty copy of pyramid bands
-  signalffs = {b: list() for b in pyr_ref.keys()}
+  signals = {b: list() for b in first_piramid.keys()}
 
   # Iteration over the frames
   while ret:
     if downsample_factor < 1:
-      vframein = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
+      frame = cv.resize(frame, (0,0), fx=downsample_factor, fy=downsample_factor)
 
     # Create a grey frame
-    grayframe = cv.cvtColor(vframein, cv.COLOR_BGR2GRAY)
-    full_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
+    grayframe = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    norm_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
     # Creating StreerablePyramid of the frame
-    pyr = pt.pyramids.SteerablePyramidFreq(full_frame, nscale, norientation - 1, is_complex=True)
+    pyramid = pt.pyramids.SteerablePyramidFreq(norm_frame, nscale, norientation - 1, is_complex=True)
 
     # Can be changed with this
     # pyr = pt.pyramids.SteerablePyramidSpace(full_frame, nscale, norientation - 1) 
 
-    pyr = pyr.pyr_coeffs
+    pyramid = pyramid.pyr_coeffs
 
     # Make all bands positive to build the pyramide amplitude
-    pyr_amp = dict()
-    for band, matrix in pyr.items():
-      pyr_amp[band] = np.abs(matrix)
+    amp_pyramid = dict()
+    for band, coeffs in pyramid.items():
+      amp_pyramid[band] = np.abs(coeffs)
 
     # We have that np.angle return for each complex number the angle (in radiant) of the vector that the complex number form over (Real, i) space.
     # We calculate the differences of the angle of the bands between the current frame and the first frame of the image
     # Formula (2) of the paper
-    pyr_delta_phase = dict()
-    for band, matrix in pyr.items():
-      matrix_ref = pyr_ref[band]
-      pyr_delta_phase[band] = np.mod(math.pi + np.angle(matrix) - np.angle(matrix_ref), 2 * math.pi) - math.pi
+    dphase_pyramid = dict()
+    for band, coeffs in pyramid.items():
+      first_coeffs = first_piramid[band]
+      dphase_pyramid[band] = np.mod(math.pi + np.angle(coeffs) - np.angle(first_coeffs), 2 * math.pi) - math.pi
 
-    for band in pyr.keys():
-      amp = pyr_amp[band]
-      phase = pyr_delta_phase[band]
+    for band in pyramid.keys():
+      amp = amp_pyramid[band]
+      phase = dphase_pyramid[band]
 
       # Here we have the formula (3) of the paper where we compute a sigle motion signal 
-      phasew = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
+      sms = np.multiply(phase, np.multiply(np.abs(amp), np.abs(amp)))
 
       # Here we do the mean 
-      sumamp = np.sum(np.abs(amp.flatten()))
-      signalffs[band].append(np.mean(phasew.flatten()) / sumamp)
+      total_amp = np.sum(np.abs(amp.flatten()))
+      signals[band].append(np.mean(sms.flatten()) / total_amp)
 
-    ret, vframein = v_hsandle.read()
+    ret, frame = video.read()
 
   # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
-  sigout = np.zeros(nframes)
-  for sig in signalffs.values():
-    sig_aligned = align_vectors(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
+  sound = np.zeros(nframes)
+  for sig in signals.values():
+    sig_aligned = align_vectors(np.array(sig), np.array(signals[(0, 0)]))  # With "residual_lowpass" same result
 
-    sigout += sig_aligned
+    sound += sig_aligned
 
   # b, a = signal.butter(3, 0.05, btype='highpass')
-  # x = signal.lfilter(b, a, sigout)
+  # x = signal.lfilter(b, a, sound)
 
   # More stable filter
   sos = signal.butter(3, 0.05, btype='highpass', output='sos')
-  x = signal.sosfilt(sos, sigout)
+  filtered_sound = signal.sosfilt(sos, sound)
 
-  x = get_sound_scaled_to_one(x)
+  filtered_sound = get_sound_scaled_to_one(filtered_sound)
 
-  return x
+  return filtered_sound

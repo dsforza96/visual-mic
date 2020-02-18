@@ -17,9 +17,9 @@ def parse_args():
   return parser.parse_args()
 
 
-def plot_specgram(x, sampling_rate):
+def plot_specgram(sound, sampling_rate):
   plt.figure()
-  plt.specgram(x, Fs=sampling_rate, cmap=plt.get_cmap('jet'))
+  plt.specgram(sound, Fs=sampling_rate, cmap=plt.get_cmap('jet'))
   plt.xlabel('Time (sec)')
   plt.ylabel('Frequency (Hz)')
   plt.colorbar().set_label('PSD (dB)')
@@ -29,19 +29,19 @@ def plot_specgram(x, sampling_rate):
 if __name__ == '__main__':
   args = parse_args()
 
-  vr = cv.VideoCapture(args.input_video)
-  sr = round(vr.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
+  video = cv.VideoCapture(args.input_video)
+  sr = round(video.get(cv.CAP_PROP_FPS)) if args.sampling_rate is None else args.sampling_rate
 
-  x = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
+  sound = sound_from_video(video, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
-  plot_specgram(x, sr)
-  wavfile.write(args.output, sr, x)
+  plot_specgram(sound, sr)
+  wavfile.write(args.output, sr, sound)
 
-  x_specsub = get_soud_spec_sub(x)
+  sound_specsub = get_soud_spec_sub(sound)
 
-  plot_specgram(x_specsub, sr)
+  plot_specgram(sound_specsub, sr)
 
   dir, file = path.split(args.output)
   f_name, f_extension = path.splitext(file)
 
-  wavfile.write(path.join(dir, f_name + '_specsub' + f_extension), sr, x_specsub)
+  wavfile.write(path.join(dir, f_name + '_specsub' + f_extension), sr, sound_specsub)

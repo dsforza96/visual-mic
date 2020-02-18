@@ -2,42 +2,40 @@ import numpy as np
 from scipy import signal
 
 
-# This function scale and center x_in to the range [-1, 1]
-def get_sound_scaled_to_one(x_in: np.array):
-  x = x_in
+# This function scale and center sound to the range [-1, 1]
+def get_sound_scaled_to_one(sound: np.array):
+  maxv = np.max(sound)
+  minv = np.min(sound)
 
-  maxsx = np.max(x)
-  minsx = np.min(x)
-
-  if maxsx != 1.0 or minsx != -1.0:
-    rangesx = maxsx - minsx
-    x = 2 * x / rangesx
-    newmax = np.max(x)
+  if maxv != 1.0 or minv != -1.0:
+    rangev = maxv - minv
+    sound = 2 * sound / rangev
+    newmax = np.max(sound)
     offset = newmax - 1.0
-    x -= offset
+    sound -= offset
 
-  return x
+  return sound
 
 
-# Function to improve x using spectral subtraction. Adapted
+# Function to improve sound using spectral subtraction. Adapted
 # from the original work of Myers Abraham Davis (Abe Davis), MIT
-def get_soud_spec_sub(x: np.array, qtl=0.5):
-  _, _, st = signal.stft(x)
+def get_soud_spec_sub(sound: np.array, qtl=0.5):
+  _, _, st = signal.stft(sound)
 
-  stmags = np.multiply(np.abs(st), np.abs(st))
-  stangles = np.angle(st)
+  st_mags = np.multiply(np.abs(st), np.abs(st))
+  st_angles = np.angle(st)
 
-  hold_col = np.quantile(stmags, qtl, axis=-1)
+  noise_floor = np.quantile(st_mags, qtl, axis=-1)
 
-  for q in range(stmags.shape[-1]):
-    stmags[:, q] -= hold_col
-    stmags[:, q] = np.maximum(stmags[:,q], 0.0)
+  for q in range(st_mags.shape[-1]):
+    st_mags[:, q] -= noise_floor
+    st_mags[:, q] = np.maximum(st_mags[:,q], 0.0)
 
-  stmags = np.sqrt(stmags)
-  newst = np.multiply(stmags, 1j * stangles)
+  st_mags = np.sqrt(st_mags)
+  newst = np.multiply(st_mags, 1j * st_angles)
 
-  _, new_x = signal.istft(newst)
+  _, new_sound = signal.istft(newst)
 
-  new_x = get_sound_scaled_to_one(new_x)
+  new_sound = get_sound_scaled_to_one(new_sound)
 
-  return new_x
+  return new_sound
