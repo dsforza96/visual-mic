@@ -13,12 +13,12 @@ def get_sound_scaled_to_one(x_in: np.array):
     x = 2 * x / rangesx
     newmax = np.max(x)
     offset = newmax - 1.0
-    x = x - offset
+    x -= offset
 
   return x
 
 
-def get_soud_spec_sub (x: np.array, qtl=0.5):
+def get_soud_spec_sub(x: np.array, qtl=0.5):
   _, _, st = signal.stft(x)
 
   stmags = np.multiply(np.abs(st), np.abs(st))
