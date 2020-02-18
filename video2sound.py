@@ -17,20 +17,20 @@ def parse_args():
   return parser.parse_args()
 
 
-def plot_specgram(x: np.array):
+def plot_specgram(x, sampling_rate):
   plt.figure()
-  plt.specgram(x, Fs=sr, cmap=plt.get_cmap('jet'))
+  plt.specgram(x, Fs=sampling_rate, cmap=plt.get_cmap('jet'))
   plt.xlabel('Time (sec)')
   plt.ylabel('Frequency (Hz)')
   plt.colorbar().set_label('PSD (dB)')
   plt.show()
 
 
-def save_audio(x: np.array, sr, output_file, file_suffix=''):
-  dir, file = path.split(output_file)
-  f_name, f_extension = path.splitext(file)
+# def save_audio(x, sr, output_file, file_suffix=''):
+#   dir, file = path.split(output_file)
+#   f_name, f_extension = path.splitext(file)
 
-  wavfile.write(path.join(dir, f_name + file_suffix + f_extension), sr, x)
+#   wavfile.write(path.join(dir, f_name + file_suffix + f_extension), sr, x)
 
 
 if __name__ == '__main__':
@@ -41,16 +41,22 @@ if __name__ == '__main__':
 
   x, x_nofilt, x_noalig = sound_from_video(vr, 1, 2, downsample_factor=0.1, sampling_rate=sr)
 
-  plot_specgram(x)
-  save_audio(x, sr, args.output)
+  plot_specgram(x, sr)
+  wavfile.write(args.output, sr, x)
 
-  # plot_specgram(x_nofilt)
+  # plot_specgram(x_nofilt, sr)
   # save_audio(x_nofilt, sr, args.output, '_nofilt')
 
-  # plot_specgram(x_noalig)
+  # plot_specgram(x_noalig, sr)
   # save_audio(x_noalig, sr, args.output, '_noalig')
 
   x_specsub = get_soud_spec_sub(x)
 
-  plot_specgram(x_specsub)
-  save_audio(x_specsub, sr, args.output, '_specsub')
+  plot_specgram(x_specsub, sr)
+
+  dir, file = path.split(args.output)
+  f_name, f_extension = path.splitext(file)
+
+  wavfile.write(path.join(dir, f_name + '_specsub' + f_extension), sr, x_specsub)
+
+  # save_audio(x_specsub, sr, args.output, '_specsub')

@@ -25,7 +25,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   ret, vframein = v_hsandle.read()
 
   if downsample_factor < 1:
-    colorframe = cv.resize(vframein, (0,0), fx=downsample_factor, fy=downsample_factor)
+    colorframe = cv.resize(vframein, (0, 0), fx=downsample_factor, fy=downsample_factor)
   else:
     colorframe = vframein
 
@@ -89,7 +89,7 @@ def sound_from_video(v_hsandle: cv.VideoCapture, nscale, norientation, downsampl
   # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
   sigout = np.zeros(nframes)
   for sig in signalffs.values():
-    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs["residual_highpass"]))  # With "residual_lowpass" same result
+    sig_aligned , _ = align_A2B(np.array(sig), np.array(signalffs[(0, 0)]))  # With "residual_lowpass" same result
 
     sigout += sig_aligned
 
