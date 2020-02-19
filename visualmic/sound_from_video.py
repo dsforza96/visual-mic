@@ -25,13 +25,13 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
   ret, frame = video.read()
 
   if downsample_factor < 1:
-    colorframe = cv.resize(frame, (0, 0), fx=downsample_factor, fy=downsample_factor)
+    scaled_frame = cv.resize(frame, (0, 0), fx=downsample_factor, fy=downsample_factor)
   else:
-    colorframe = frame
+    scaled_frame = frame
 
   # Converting the first frame to gray
-  grayframe = cv.cvtColor(colorframe, cv.COLOR_BGR2GRAY)
-  norm_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
+  gray_frame = cv.cvtColor(scaled_frame, cv.COLOR_BGR2GRAY)
+  norm_frame = cv.normalize(gray_frame.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
   first_frame = norm_frame
 
@@ -48,8 +48,8 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
       frame = cv.resize(frame, (0,0), fx=downsample_factor, fy=downsample_factor)
 
     # Creating a grey frame
-    grayframe = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    norm_frame = cv.normalize(grayframe.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
+    gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    norm_frame = cv.normalize(gray_frame.astype('float'), None, 0.0, 1.0, cv.NORM_MINMAX)
 
     # Creating StreerablePyramid of the frame
     pyramid = pt.pyramids.SteerablePyramidFreq(norm_frame, nscale, norientation - 1, is_complex=True)
