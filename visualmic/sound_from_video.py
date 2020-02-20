@@ -7,7 +7,7 @@ from scipy import signal
 from .sound_spectral_subtraction import get_scaled_sound
 
 
-# This function allign v1 and v2 vectors: it is the formula (4) of paper
+# This function align v1 and v2 vectors: it is the formula (4) of paper
 def align_vectors(v1: np.array, v2: np.array):
   acorb = np.convolve(v1, np.flip(v2))
 
@@ -85,7 +85,7 @@ def sound_from_video(video: cv.VideoCapture, nscale, norientation, downsample_fa
 
     ret, frame = video.read()
 
-  # Here we do the formula (4) and (5) of the paper where we allign the signals and after that we do the sum
+  # Here we do the formula (4) and (5) of the paper where we align the signals and after that we do the sum
   sound = np.zeros(nframes)
   for sig in signals.values():
     sig_aligned = align_vectors(np.array(sig), np.array(signals[(0, 0)]))  # With "residual_lowpass" same result
