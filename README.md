@@ -1,8 +1,8 @@
 # The Visual Microphone: Passive Recovery of Sound from Video
 
-A Phyton implementation of MIT's Visual Microphone [1].
+A Python implementation of MIT's Visual Microphone [1].
 
-Our code is based on the original MATLAB version and depends on OpenCV for handling videos, SciPy for signal processing and writing audio files and [pyrtools](https://github.com/LabForComputationalVision/pyrtools) [2] to compute complex steerable pyramids. Other requirements are NumPy and Matplotlib.
+Our code is based on the original [MATLAB version](http://people.csail.mit.edu/mrub/VisualMic/#data). It depends on OpenCV for handling videos, SciPy for signal processing and writing audio files and [pyrtools](https://github.com/LabForComputationalVision/pyrtools) [2] to compute complex steerable pyramids. Other requirements are NumPy and Matplotlib.
 
 
 ## Usage
@@ -20,7 +20,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         The path of the output file
   -s SAMPLING_RATE, --sampling-rate SAMPLING_RATE
-                        The video frame rate
+                        The frame rate of the input video
 ```
 
 
@@ -29,7 +29,7 @@ optional arguments:
 [Antonio Musolino](https://github.com/antoniomuso/) and [Davide Sforza](https://github.com/dsforza96).
 
 
-## Referencies
+## References
 
 [1] DAVIS, Abe, et al. The visual microphone: Passive recovery of sound from video. 2014.
 
